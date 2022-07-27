@@ -38,6 +38,7 @@ public class Project {
      * Instantiates a new Project.
      *
      */
+
     public Project(long id, @NonNull String name, @ColorInt int color) {
         this.id = id;
         this.name = name;
@@ -53,6 +54,7 @@ public class Project {
      *
      * @return all the projects of the application
      */
+    @NonNull
     public static Project[] getAllProjects() {
         return new Project[]{
                 new Project(1L, "Projet Tartampion", 0xFFEADAD1),
@@ -119,6 +121,7 @@ public class Project {
     }
 
     @Override
+    @NonNull
     public String toString() {
         return getName();
     }

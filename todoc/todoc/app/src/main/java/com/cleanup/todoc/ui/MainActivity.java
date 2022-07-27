@@ -1,6 +1,7 @@
 package com.cleanup.todoc.ui;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cleanup.todoc.R;
+import com.cleanup.todoc.data.database.ViewModelFactory;
 import com.cleanup.todoc.domain.model.Project;
 import com.cleanup.todoc.domain.model.Task;
 
@@ -26,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Home activity of the application which is displayed when the user opens the app.</p>
@@ -38,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     /**
      * List of all projects available in the application
      */
-    private final Project[] allProjects = Project.getAllProjects();
-
+    //private final Project[] allProjects = Project.getAllProjects();
+    private List<Project> allProjects;
     /**
      * The adapter which handles the list of tasks
      */
@@ -74,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      */
     // Suppress warning is safe because variable is initialized in onCreate
     @SuppressWarnings("NullableProblems")
-
+    @NonNull
     private RecyclerView listTasks;
 
     /**
@@ -82,11 +86,13 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      */
     // Suppress warning is safe because variable is initialized in onCreate
     @SuppressWarnings("NullableProblems")
-
+    @NonNull
     private TextView lblNoTasks;
 
     private MainActivityViewModel viewModel;
+    public static final int taskRequestCode = 1;
 
+    // TodocDatabase database = TodocDatabase.getInstance(getApplicationContext());
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,28 +102,23 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
         configureUI();
         observeUI();
-
     }
 
     private void observeUI() {
-       viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        // viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this, new ViewModelFactory(viewModel.projectRepository, viewModel.taskRepository, viewModel.executor)).get(MainActivityViewModel.class);
+        // viewModel = new ViewModelProvider(this,ViewModelFactory.getInstance()).get(MainActivityViewModel.class);
 
-       viewModel.getTasks().observe(this, tasks1 -> {
-           adapter.updateTasks(tasks1);
-       });
+        viewModel.getListTasks().observe(this, tasks1 -> {
+            adapter.updateTasks(tasks1);
 
-        /*viewModel.getProjects().observe(this, projects -> {
-            adapter.updateTasks(projects);
         });
-
-        findViewById(R.id.fab_add_task).setOnClickListener(view -> {
+        //viewModel.fetchTasks();
+       // viewModel.initProjects();
+       /* findViewById(R.id.fab_add_task).setOnClickListener(view -> {
             viewModel.increment();
         });*/
     }
-
-
-
-
 
     private void configureUI() {
         listTasks = findViewById(R.id.list_tasks);
@@ -127,6 +128,29 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         listTasks.setAdapter(adapter);
 
         findViewById(R.id.fab_add_task).setOnClickListener(view -> showAddTaskDialog());
+    }
+
+    private void getTask() {
+        viewModel.getListTasks().observe(this, this::updateTasks);
+    }
+
+    private void getProjects() {
+        viewModel.getProjects().observe(this, this::updateProjects);
+    }
+
+    private void updateProjects(List<Project> projects) {
+        allProjects = projects;
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == taskRequestCode && resultCode == RESULT_OK) {
+
+        } else {
+
+        }
     }
 
     @Override
@@ -149,15 +173,14 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             sortMethod = SortMethod.RECENT_FIRST;
         }
 
-        updateTasks();
+        getTask();
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onDeleteTask(Task task) {
-        tasks.remove(task);
-        updateTasks();
+        // tasks.remove(task);
         viewModel.deleteTask(task.getId());
     }
 
@@ -186,7 +209,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             else if (taskProject != null) {
                 // TODO: Replace this by id of persisted task
                 long id = (long) (Math.random() * 50000);
-               // long taskId= this.viewModel.createTask(id, projectId, name, creationTimestramp);
 
                 Task task = new Task(
                         id,
@@ -230,14 +252,16 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      * @param task the task to be added to the list
      */
     private void addTask(Task task) {
-        tasks.add(task);
-        updateTasks();
+        //tasks.add(task);
+        //viewModel.createTask(task.getId(), task.getProjectId(), task.getName(), task.getCreationTimestamp());
+        viewModel.createTask(task);
     }
 
     /**
      * Updates the list of tasks in the UI
      */
-    private void updateTasks() {
+    private void updateTasks(List<Task> tasks) {
+
         if (tasks.size() == 0) {
             lblNoTasks.setVisibility(View.VISIBLE);
             listTasks.setVisibility(View.GONE);
@@ -268,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      *
      * @return the dialog allowing the user to create a new task
      */
-
+    @NonNull
     private AlertDialog getAddTaskDialog() {
         final AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Dialog);
 

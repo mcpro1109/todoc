@@ -3,9 +3,11 @@ package com.cleanup.todoc.data.database;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.cleanup.todoc.data.dao.ProjectDao;
 import com.cleanup.todoc.data.dao.TaskDao;
@@ -20,10 +22,8 @@ public abstract class TodocDatabase extends RoomDatabase {
 
     //DAO
     public abstract ProjectDao projectDao();
-    
 
     public abstract TaskDao taskDao();
-
 
     //Instance
     public static TodocDatabase getInstance(Context context) {
@@ -31,7 +31,7 @@ public abstract class TodocDatabase extends RoomDatabase {
             synchronized (TodocDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(), TodocDatabase.class, "MyDadabase.db")
-                            //.addCallback(prepopulateDatabase())
+                            .addCallback(prepopulateDatabase())
                             .build();
                 }
             }
@@ -39,15 +39,18 @@ public abstract class TodocDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-   /* private static Callback prepopulateDatabase() {
+    private static Callback prepopulateDatabase() {
         return new Callback() {
             @Override
             public void onCreate(@NonNull SupportSQLiteDatabase db) {
                 super.onCreate(db);
+
             }
 
         };
 
 
-    }*/
+    }
+
+
 }

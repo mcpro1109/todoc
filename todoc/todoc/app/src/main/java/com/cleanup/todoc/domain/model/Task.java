@@ -38,7 +38,7 @@ public class Task {
      * The name of the task
      */
     // Suppress warning because setName is called in constructor
-    //@SuppressWarnings("NullableProblems")
+    @SuppressWarnings("NullableProblems")
     @NonNull
     private String name;
 
@@ -61,7 +61,8 @@ public class Task {
         this.setName(name);
         this.setCreationTimestamp(creationTimestamp);
     }
-    
+
+
     /**
      * Returns the unique identifier of the task.
      *
@@ -114,7 +115,7 @@ public class Task {
      *
      * @param name the name of the task to set
      */
-    private void setName(String name) {
+    private void setName(@NonNull String name) {
         this.name = name;
     }
 

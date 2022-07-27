@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,13 +26,13 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
     /**
      * The list of tasks the adapter deals with
      */
-
+@NonNull
     private List<Task> tasks;
 
     /**
      * The listener for when a task needs to be deleted
      */
-
+@NonNull
     private final DeleteTaskListener deleteTaskListener;
 
     /**
@@ -39,7 +40,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
      *
      * @param tasks the list of tasks the adapter deals with to set
      */
-    TasksAdapter( final List<Task> tasks,  final DeleteTaskListener deleteTaskListener) {
+    TasksAdapter(@NonNull final List<Task> tasks, @NonNull final DeleteTaskListener deleteTaskListener) {
         this.tasks = tasks;
         this.deleteTaskListener = deleteTaskListener;
     }
@@ -54,15 +55,15 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         notifyDataSetChanged();
     }
 
-
+@NonNull
     @Override
-    public TaskViewHolder onCreateViewHolder( ViewGroup viewGroup, int viewType) {
+    public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_task, viewGroup, false);
         return new TaskViewHolder(view, deleteTaskListener);
     }
 
     @Override
-    public void onBindViewHolder( TaskViewHolder taskViewHolder, int position) {
+    public void onBindViewHolder(@NonNull TaskViewHolder taskViewHolder, int position) {
         taskViewHolder.bind(tasks.get(position));
     }
 
@@ -120,7 +121,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
          * @param itemView the view of the task item
          * @param deleteTaskListener the listener for when a task needs to be deleted to set
          */
-        TaskViewHolder( View itemView,  DeleteTaskListener deleteTaskListener) {
+        TaskViewHolder(@NonNull View itemView,@NonNull  DeleteTaskListener deleteTaskListener) {
             super(itemView);
 
             this.deleteTaskListener = deleteTaskListener;

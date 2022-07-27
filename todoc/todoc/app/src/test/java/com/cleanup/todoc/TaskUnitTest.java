@@ -1,5 +1,9 @@
 package com.cleanup.todoc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
 import com.cleanup.todoc.domain.model.Task;
 
 import org.junit.Test;
@@ -7,10 +11,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 
 /**
  * Unit tests for tasks
@@ -98,4 +98,5 @@ public class TaskUnitTest {
         assertSame(tasks.get(1), task2);
         assertSame(tasks.get(2), task3);
     }
+
 }
