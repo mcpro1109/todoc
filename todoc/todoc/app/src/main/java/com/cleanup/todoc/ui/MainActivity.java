@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cleanup.todoc.R;
-import com.cleanup.todoc.data.database.ViewModelFactory;
+import com.cleanup.todoc.data.database.TodocDatabase;
 import com.cleanup.todoc.domain.model.Project;
 import com.cleanup.todoc.domain.model.Task;
 
@@ -38,12 +38,12 @@ import java.util.List;
  * @author Gaëtan HERFRAY
  */
 public class MainActivity extends AppCompatActivity implements TasksAdapter.DeleteTaskListener {
-
     /**
      * List of all projects available in the application
      */
-    //private final Project[] allProjects = Project.getAllProjects();
-    private List<Project> allProjects;
+    // private final ArrayList<Project> allProjects = new ArrayList<>();
+    private Project[] allProjects = Project.getAllProjects();
+    // private List<Project> allProjects;
     /**
      * The adapter which handles the list of tasks
      */
@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     /**
      * The sort method to be used to display tasks
      */
-
     private SortMethod sortMethod = SortMethod.NONE;
 
     /**
@@ -92,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     private MainActivityViewModel viewModel;
     public static final int taskRequestCode = 1;
 
-    // TodocDatabase database = TodocDatabase.getInstance(getApplicationContext());
+    private TodocDatabase todocDatabase;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,19 +104,15 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     }
 
     private void observeUI() {
-        // viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-        viewModel = new ViewModelProvider(this, new ViewModelFactory(viewModel.projectRepository, viewModel.taskRepository, viewModel.executor)).get(MainActivityViewModel.class);
-        // viewModel = new ViewModelProvider(this,ViewModelFactory.getInstance()).get(MainActivityViewModel.class);
+        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
-        viewModel.getListTasks().observe(this, tasks1 -> {
-            adapter.updateTasks(tasks1);
-
+        viewModel.getTasksLiveData().observe(this, this::updateTasks);
+        viewModel.getProjectsLiveData().observe(this, projects -> {
+            // allProjects.clear();
+            // allProjects.addAll(projects);
         });
-        //viewModel.fetchTasks();
-       // viewModel.initProjects();
-       /* findViewById(R.id.fab_add_task).setOnClickListener(view -> {
-            viewModel.increment();
-        });*/
+        getTask();
+        viewModel.refreshProjects();
     }
 
     private void configureUI() {
@@ -125,31 +120,34 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         lblNoTasks = findViewById(R.id.lbl_no_task);
 
         listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
         listTasks.setAdapter(adapter);
 
         findViewById(R.id.fab_add_task).setOnClickListener(view -> showAddTaskDialog());
     }
 
+   /* @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        // Checks the orientation of the screen
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
+            listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
+            listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        }
+    }*/
+
     private void getTask() {
-        viewModel.getListTasks().observe(this, this::updateTasks);
+        viewModel.refreshTasks();
     }
-
-    private void getProjects() {
-        viewModel.getProjects().observe(this, this::updateProjects);
-    }
-
-    private void updateProjects(List<Project> projects) {
-        allProjects = projects;
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == taskRequestCode && resultCode == RESULT_OK) {
-
-        } else {
-
         }
     }
 
@@ -207,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             }
             // If both project and name of the task have been set
             else if (taskProject != null) {
-                // TODO: Replace this by id of persisted task
+
                 long id = (long) (Math.random() * 50000);
 
                 Task task = new Task(
@@ -252,16 +250,13 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      * @param task the task to be added to the list
      */
     private void addTask(Task task) {
-        //tasks.add(task);
-        //viewModel.createTask(task.getId(), task.getProjectId(), task.getName(), task.getCreationTimestamp());
-        viewModel.createTask(task);
+        this.viewModel.createTask(task);
     }
 
     /**
      * Updates the list of tasks in the UI
      */
     private void updateTasks(List<Task> tasks) {
-
         if (tasks.size() == 0) {
             lblNoTasks.setVisibility(View.VISIBLE);
             listTasks.setVisibility(View.GONE);

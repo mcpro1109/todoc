@@ -1,30 +1,22 @@
 package com.cleanup.todoc.domain.repository;
 
-import androidx.lifecycle.LiveData;
-
+import com.cleanup.todoc.TodocApp;
 import com.cleanup.todoc.data.dao.ProjectDao;
+import com.cleanup.todoc.data.database.TodocDatabase;
 import com.cleanup.todoc.domain.model.Project;
 
 import java.util.List;
 
 public class ProjectRepository {
-    //fait le lien entre le viewmodel et la base de données Project
-   /* private static final ProjectRepository instance = new ProjectRepository(getInstance().projectDao);
+
+    private final ProjectDao projectDao = TodocDatabase.getInstance(TodocApp.app).projectDao();
+
+    private static ProjectRepository instance;
 
     public static ProjectRepository getInstance() {
+        if(instance == null) instance = new ProjectRepository();
         return instance;
-    }*/
-
-    private final ProjectDao projectDao;
-
-    public ProjectRepository(ProjectDao projectDao) {
-        this.projectDao = projectDao;
     }
 
-
-    //récupérer la liste des projects
-    //public List<Project> getProject(long projectId){return projectDao.getProject(projectId);}
-    public LiveData<List<Project>> getProjects(){return projectDao.getProjects();}
-
-
+    public List<Project> getProjects(){ return projectDao.getProjects(); }
 }

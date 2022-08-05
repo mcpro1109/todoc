@@ -2,6 +2,7 @@ package com.cleanup.todoc.data.database;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -13,6 +14,8 @@ import com.cleanup.todoc.data.dao.ProjectDao;
 import com.cleanup.todoc.data.dao.TaskDao;
 import com.cleanup.todoc.domain.model.Project;
 import com.cleanup.todoc.domain.model.Task;
+
+import java.util.concurrent.Executors;
 
 @Database(entities = {Project.class, Task.class}, version = 1, exportSchema = false)
 public abstract class TodocDatabase extends RoomDatabase {
@@ -30,8 +33,10 @@ public abstract class TodocDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             synchronized (TodocDatabase.class) {
                 if (INSTANCE == null) {
+                    Log.d("app", "databasecreate1");
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(), TodocDatabase.class, "MyDadabase.db")
-                            .addCallback(prepopulateDatabase())
+                            .addCallback(prepopulateDatabase(context))
+                            //.allowMainThreadQueries()
                             .build();
                 }
             }
@@ -39,18 +44,27 @@ public abstract class TodocDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-    private static Callback prepopulateDatabase() {
+    private static Callback prepopulateDatabase(Context context) {
         return new Callback() {
+            @Override
+            public void onOpen(@NonNull SupportSQLiteDatabase db) {
+                super.onOpen(db);
+                //pour mettre les projects dans la database
+              //  Log.d("app", "databasecreate3");
+                Executors.newSingleThreadScheduledExecutor().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        getInstance(context).projectDao().insertAll(Project.getAllProjects());
+                    }
+                });
+            }
+
             @Override
             public void onCreate(@NonNull SupportSQLiteDatabase db) {
                 super.onCreate(db);
-
+              //  Log.d("app", "databasecreate2");
             }
-
         };
-
-
     }
-
 
 }

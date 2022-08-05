@@ -11,10 +11,6 @@ import java.util.List;
 @Dao
 public interface TaskDao {
 
-    /*static TaskDao getInstance() {
-        return  ;
-    }*/
-
     //créer instance avec room
     @Query("SELECT * FROM tasks")
     List<Task> getAll();
@@ -26,7 +22,6 @@ public interface TaskDao {
     //ajouter dans la liste
     @Insert
     long insertTask(Task task);
-
 
     //supprimer
     @Query("DELETE FROM tasks WHERE id= :taskId")

@@ -1,6 +1,5 @@
 package com.cleanup.todoc.data.dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -19,5 +18,8 @@ public interface ProjectDao {
     //@Query("SELECT * FROM projects WHERE id= :projectId")
     @Query("SELECT * FROM projects")
     //List<Project> getProject(long projectId);
-    LiveData<List<Project>> getProjects();
+    List<Project>getProjects();
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(Project... projects);
 }

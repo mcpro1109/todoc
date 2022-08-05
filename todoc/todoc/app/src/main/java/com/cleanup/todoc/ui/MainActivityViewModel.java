@@ -1,5 +1,7 @@
 package com.cleanup.todoc.ui;
 
+import android.os.AsyncTask;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -9,83 +11,53 @@ import com.cleanup.todoc.domain.model.Task;
 import com.cleanup.todoc.domain.repository.ProjectRepository;
 import com.cleanup.todoc.domain.repository.TaskRepository;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
 
 public class MainActivityViewModel extends ViewModel {
 
     //fait le lien entre l'activity et le repository, permet de mettre à jour l'affichage des données quand elles sont modifiées
 
-    ProjectRepository projectRepository;
-    //TaskRepository taskRepository = TaskRepository.getInstance();
-    TaskRepository taskRepository;
-    Executor executor;
+    ProjectRepository projectRepository = ProjectRepository.getInstance();
+    TaskRepository taskRepository = TaskRepository.getInstance();
 
-    @Nullable
-    private MutableLiveData<List<Project>> listProjects = new MutableLiveData<>(new ArrayList<>());
-
-    public MainActivityViewModel(ProjectRepository projectRepository, TaskRepository taskRepository, Executor executor) {
-        this.projectRepository = projectRepository;
-        this.taskRepository = taskRepository;
-        this.executor = executor;
-    }
-
-    //appeler les tasks
-    @Nullable
     private final MutableLiveData<List<Task>> listTasks = new MutableLiveData<>(new ArrayList<>());
 
-    /* public LiveData<List<Task>> getTasks() {
-         return listTasks;
-     }*/
-    public LiveData<List<Task>> getListTasks() {
-        return (LiveData<List<Task>>) taskRepository.getTasks();
+    public LiveData<List<Task>> getTasksLiveData() {
+        return listTasks;
+    }
+
+    private final MutableLiveData<List<Project>> listProject = new MutableLiveData<>(new ArrayList<>());
+
+    public LiveData<List<Project>> getProjectsLiveData() {
+        return listProject;
     }
 
     public void createTask(Task createTask) {
-        executor.execute(() -> {
+        AsyncTask.execute(() -> {
             taskRepository.createTask(createTask);
+            ArrayList<Task> tasks = (ArrayList<Task>) listTasks.getValue();
+            tasks.add(createTask);
+            listTasks.postValue(tasks);
         });
     }
 
     public void deleteTask(long taskId) {
-        executor.execute(() -> {
+        AsyncTask.execute(() -> {
             taskRepository.deleteTask(taskId);
+            refreshTasks();
         });
     }
 
-    public void fetchTasks() {
-        executor.execute(() -> {
-            listTasks.setValue(taskRepository.getTasks());
+    public void refreshTasks() {
+        AsyncTask.execute(() -> {
+            listTasks.postValue(taskRepository.getTasks());
         });
     }
 
-    //projects
-
-    /*  public void initProjects(){
-          if (listProjects==null){
-              listProjects= (MutableLiveData<List<Project>>) projectRepository.getProjects();
-          }
-      }*/
-    @Nullable
-    public LiveData<List<Project>> getProjects() {
-        return listProjects;
-    }
-
-  /*  public void fetchDataProjects(){
-        executor.execute(() ->{
-            listProjects.setValue(projectRepository.getProject());
+    public void refreshProjects() {
+        AsyncTask.execute(() -> {
+            listProject.postValue(projectRepository.getProjects());
         });
-    }*/
-
-    /*private final MutableLiveData<List<Project>> projects = new MutableLiveData<>(new ArrayList<>());
-    public LiveData<List<Project>> getProjects() { return projects; }
-
-    public void fetchData() {
-        repository.getProjects().onFinish { projects ->
-            liveData.setValue(projects)
-        }
-    }*/
+    }
 }
