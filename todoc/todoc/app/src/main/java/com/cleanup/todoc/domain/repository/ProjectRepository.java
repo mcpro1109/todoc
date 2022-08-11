@@ -1,5 +1,7 @@
 package com.cleanup.todoc.domain.repository;
 
+import androidx.lifecycle.LiveData;
+
 import com.cleanup.todoc.TodocApp;
 import com.cleanup.todoc.data.dao.ProjectDao;
 import com.cleanup.todoc.data.database.TodocDatabase;
@@ -18,5 +20,5 @@ public class ProjectRepository {
         return instance;
     }
 
-    public List<Project> getProjects(){ return projectDao.getProjects(); }
+    public LiveData< List<Project>> getProjects(){ return projectDao.getProjects(); }
 }

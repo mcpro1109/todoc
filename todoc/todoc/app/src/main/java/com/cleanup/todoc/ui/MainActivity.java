@@ -2,6 +2,7 @@ package com.cleanup.todoc.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -112,7 +114,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             // allProjects.addAll(projects);
         });
         getTask();
-        viewModel.refreshProjects();
+        //viewModel.refreshProjects();
+        viewModel.getProjects();
     }
 
     private void configureUI() {
@@ -126,22 +129,24 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         findViewById(R.id.fab_add_task).setOnClickListener(view -> showAddTaskDialog());
     }
 
-   /* @Override
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
         // Checks the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             Toast.makeText(this, "landscape", Toast.LENGTH_SHORT).show();
-            listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
             Toast.makeText(this, "portrait", Toast.LENGTH_SHORT).show();
             listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         }
-    }*/
+    }
 
     private void getTask() {
         viewModel.refreshTasks();
+       // viewModel.getTasksLiveData();
+
     }
 
     @Override
@@ -180,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     public void onDeleteTask(Task task) {
         // tasks.remove(task);
         viewModel.deleteTask(task.getId());
+      //  viewModel.deleteTask(task);
     }
 
     /**

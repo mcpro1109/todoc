@@ -50,7 +50,6 @@ public abstract class TodocDatabase extends RoomDatabase {
             public void onOpen(@NonNull SupportSQLiteDatabase db) {
                 super.onOpen(db);
                 //pour mettre les projects dans la database
-              //  Log.d("app", "databasecreate3");
                 Executors.newSingleThreadScheduledExecutor().execute(new Runnable() {
                     @Override
                     public void run() {
@@ -62,7 +61,6 @@ public abstract class TodocDatabase extends RoomDatabase {
             @Override
             public void onCreate(@NonNull SupportSQLiteDatabase db) {
                 super.onCreate(db);
-              //  Log.d("app", "databasecreate2");
             }
         };
     }

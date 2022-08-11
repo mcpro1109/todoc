@@ -26,4 +26,6 @@ public interface TaskDao {
     //supprimer
     @Query("DELETE FROM tasks WHERE id= :taskId")
     int deleteTask(long taskId);
+   /* @Delete
+    void deleteTask(Task task);*/
 }

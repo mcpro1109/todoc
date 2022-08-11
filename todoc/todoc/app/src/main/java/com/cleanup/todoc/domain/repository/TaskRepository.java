@@ -32,5 +32,8 @@ public class TaskRepository {
     public void deleteTask(long taskId){
         taskDao.deleteTask(taskId);
     }
+   /* public void deleteTask(Task task){
+        taskDao.deleteTask(task);
+    }*/
 
 }

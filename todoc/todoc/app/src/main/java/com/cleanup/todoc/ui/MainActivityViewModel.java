@@ -2,6 +2,7 @@ package com.cleanup.todoc.ui;
 
 import android.os.AsyncTask;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -42,12 +43,14 @@ public class MainActivityViewModel extends ViewModel {
         });
     }
 
-    public void deleteTask(long taskId) {
-        AsyncTask.execute(() -> {
-            taskRepository.deleteTask(taskId);
-            refreshTasks();
-        });
-    }
+   public void deleteTask(long task) {
+       AsyncTask.execute(() -> {
+           taskRepository.deleteTask(task);
+           refreshTasks();
+
+           //getTasksLiveData();
+       });
+   }
 
     public void refreshTasks() {
         AsyncTask.execute(() -> {
@@ -55,9 +58,15 @@ public class MainActivityViewModel extends ViewModel {
         });
     }
 
-    public void refreshProjects() {
+
+    /*public void refreshProjects() {
         AsyncTask.execute(() -> {
             listProject.postValue(projectRepository.getProjects());
         });
+    }*/
+
+    @Nullable
+    public LiveData<List<Project>> getProjects() {
+        return projectRepository.getProjects();
     }
 }
