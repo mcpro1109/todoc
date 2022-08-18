@@ -168,8 +168,6 @@ public class Task {
         }
     }
 
-
-
     public long getProjectId() {
         return projectId;
     }

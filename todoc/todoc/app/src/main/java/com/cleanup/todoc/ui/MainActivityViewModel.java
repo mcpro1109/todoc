@@ -46,22 +46,17 @@ public class MainActivityViewModel extends ViewModel {
    public void deleteTask(long task) {
        AsyncTask.execute(() -> {
            taskRepository.deleteTask(task);
-           refreshTasks();
-
-           //getTasksLiveData();
+           //refreshTasks();
+           getTasks();
        });
    }
 
-    public void refreshTasks() {
+   public LiveData<List<Task>> getTasks(){
+        return taskRepository.getTasks();
+   }
+  /*  public void refreshTasks() {
         AsyncTask.execute(() -> {
             listTasks.postValue(taskRepository.getTasks());
-        });
-    }
-
-
-    /*public void refreshProjects() {
-        AsyncTask.execute(() -> {
-            listProject.postValue(projectRepository.getProjects());
         });
     }*/
 

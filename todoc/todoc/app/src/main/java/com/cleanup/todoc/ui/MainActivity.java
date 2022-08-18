@@ -43,9 +43,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     /**
      * List of all projects available in the application
      */
-    // private final ArrayList<Project> allProjects = new ArrayList<>();
     private Project[] allProjects = Project.getAllProjects();
-    // private List<Project> allProjects;
     /**
      * The adapter which handles the list of tasks
      */
@@ -110,11 +108,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
         viewModel.getTasksLiveData().observe(this, this::updateTasks);
         viewModel.getProjectsLiveData().observe(this, projects -> {
-            // allProjects.clear();
-            // allProjects.addAll(projects);
         });
         getTask();
-        //viewModel.refreshProjects();
         viewModel.getProjects();
     }
 
@@ -144,9 +139,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     }
 
     private void getTask() {
-        viewModel.refreshTasks();
-       // viewModel.getTasksLiveData();
-
+       // viewModel.refreshTasks();
+        viewModel.getTasks().observe(this,this::updateTasks);
     }
 
     @Override

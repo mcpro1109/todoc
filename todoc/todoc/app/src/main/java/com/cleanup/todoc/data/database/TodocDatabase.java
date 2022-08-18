@@ -2,7 +2,6 @@ package com.cleanup.todoc.data.database;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -20,6 +19,7 @@ import java.util.concurrent.Executors;
 @Database(entities = {Project.class, Task.class}, version = 1, exportSchema = false)
 public abstract class TodocDatabase extends RoomDatabase {
 
+    public static boolean isMemory = false;
     //Singleton : permet d'avoir une seule instance pour modifier la database
     private static volatile TodocDatabase INSTANCE;
 
@@ -33,29 +33,30 @@ public abstract class TodocDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             synchronized (TodocDatabase.class) {
                 if (INSTANCE == null) {
-                    Log.d("app", "databasecreate1");
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(), TodocDatabase.class, "MyDadabase.db")
-                            .addCallback(prepopulateDatabase(context))
-                            //.allowMainThreadQueries()
-                            .build();
+                    if (isMemory) {
+                        INSTANCE = Room.inMemoryDatabaseBuilder(context, TodocDatabase.class)
+                                .allowMainThreadQueries()
+                                .build();
+                        INSTANCE.clearAllTables();
+                        INSTANCE.projectDao().insertAll(Project.getAllProjects());
+                    } else {
+                        INSTANCE = Room.databaseBuilder(context.getApplicationContext(), TodocDatabase.class, "MyDadabase.db")
+                                .addCallback(prepopulateDatabase(INSTANCE, context))
+                                .build();
+                    }
                 }
             }
         }
         return INSTANCE;
     }
 
-    private static Callback prepopulateDatabase(Context context) {
+    private static Callback prepopulateDatabase(TodocDatabase database, Context context) {
         return new Callback() {
             @Override
             public void onOpen(@NonNull SupportSQLiteDatabase db) {
                 super.onOpen(db);
                 //pour mettre les projects dans la database
-                Executors.newSingleThreadScheduledExecutor().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        getInstance(context).projectDao().insertAll(Project.getAllProjects());
-                    }
-                });
+                Executors.newSingleThreadScheduledExecutor().execute(() -> database.projectDao().insertAll(Project.getAllProjects()));
             }
 
             @Override
