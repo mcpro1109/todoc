@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     }
 
     private void getTask() {
-       // viewModel.refreshTasks();
         viewModel.getTasks().observe(this,this::updateTasks);
     }
 
@@ -177,9 +176,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
     @Override
     public void onDeleteTask(Task task) {
-        // tasks.remove(task);
         viewModel.deleteTask(task.getId());
-      //  viewModel.deleteTask(task);
     }
 
     /**

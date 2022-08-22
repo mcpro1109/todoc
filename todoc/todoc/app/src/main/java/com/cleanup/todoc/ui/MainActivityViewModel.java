@@ -46,7 +46,6 @@ public class MainActivityViewModel extends ViewModel {
    public void deleteTask(long task) {
        AsyncTask.execute(() -> {
            taskRepository.deleteTask(task);
-           //refreshTasks();
            getTasks();
        });
    }
@@ -54,11 +53,6 @@ public class MainActivityViewModel extends ViewModel {
    public LiveData<List<Task>> getTasks(){
         return taskRepository.getTasks();
    }
-  /*  public void refreshTasks() {
-        AsyncTask.execute(() -> {
-            listTasks.postValue(taskRepository.getTasks());
-        });
-    }*/
 
     @Nullable
     public LiveData<List<Project>> getProjects() {
